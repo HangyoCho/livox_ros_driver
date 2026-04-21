@@ -104,12 +104,16 @@ uint64_t GetStoragePacketTimestamp(StoragePacket *packet, uint8_t data_src) {
 
   if (raw_packet->timestamp_type == kTimestampTypePps) {
     if (data_src != kSourceLvxFile) {
-      return (timestamp.stamp + packet->time_rcv);
+      return std::chrono::high_resolution_clock::now().time_since_epoch().count();
     } else {
       return timestamp.stamp;
     }
   } else if (raw_packet->timestamp_type == kTimestampTypeNoSync) {
-    return timestamp.stamp;
+    if (data_src != kSourceLvxFile) {
+      return std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    } else {
+      return timestamp.stamp;
+    }
   } else if (raw_packet->timestamp_type == kTimestampTypePtp) {
     return timestamp.stamp;
   } else if (raw_packet->timestamp_type == kTimestampTypePpsGps) {
